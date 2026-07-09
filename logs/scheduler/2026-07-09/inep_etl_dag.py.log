@@ -1,0 +1,148 @@
+[2026-07-09T18:22:02.889+0000] {processor.py:186} INFO - Started process (PID=172) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:02.892+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:22:02.899+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:02.898+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:02.983+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:03.449+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.448+0000] {override.py:1900} INFO - Created Permission View: can delete on DAG:inep_etl_dag
+[2026-07-09T18:22:03.468+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.467+0000] {override.py:1900} INFO - Created Permission View: can edit on DAG:inep_etl_dag
+[2026-07-09T18:22:03.480+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.479+0000] {override.py:1900} INFO - Created Permission View: can read on DAG:inep_etl_dag
+[2026-07-09T18:22:03.490+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.490+0000] {override.py:1900} INFO - Created Permission View: can delete on DAG Run:inep_etl_dag
+[2026-07-09T18:22:03.502+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.502+0000] {override.py:1900} INFO - Created Permission View: menu access on DAG Run:inep_etl_dag
+[2026-07-09T18:22:03.512+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.512+0000] {override.py:1900} INFO - Created Permission View: can read on DAG Run:inep_etl_dag
+[2026-07-09T18:22:03.524+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.523+0000] {override.py:1900} INFO - Created Permission View: can create on DAG Run:inep_etl_dag
+[2026-07-09T18:22:03.525+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.525+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:22:03.556+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.556+0000] {dag.py:3262} INFO - Creating ORM DAG for inep_etl_dag
+[2026-07-09T18:22:03.582+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:03.582+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:22:03.634+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.758 seconds
+[2026-07-09T18:22:34.108+0000] {processor.py:186} INFO - Started process (PID=177) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:34.110+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:22:34.117+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:34.117+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:34.162+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:22:34.222+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:34.222+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:22:34.276+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:22:34.276+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:22:34.331+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.236 seconds
+[2026-07-09T18:23:04.573+0000] {processor.py:186} INFO - Started process (PID=182) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:04.575+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:23:04.581+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:04.580+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:04.624+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:04.686+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:04.686+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:23:04.741+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:04.741+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:23:04.796+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.240 seconds
+[2026-07-09T18:23:34.998+0000] {processor.py:186} INFO - Started process (PID=187) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:35.001+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:23:35.006+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:35.005+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:35.047+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:23:35.110+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:35.110+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:23:35.165+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:23:35.165+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:23:35.217+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.232 seconds
+[2026-07-09T18:24:05.490+0000] {processor.py:186} INFO - Started process (PID=192) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:05.494+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:24:05.500+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:05.500+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:05.550+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:05.623+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:05.622+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:24:05.687+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:05.687+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:24:05.745+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.269 seconds
+[2026-07-09T18:24:35.918+0000] {processor.py:186} INFO - Started process (PID=197) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:35.922+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:24:35.930+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:35.929+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:36.007+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:24:36.109+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:36.108+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:24:36.214+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:24:36.213+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:24:36.265+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.369 seconds
+[2026-07-09T18:25:06.418+0000] {processor.py:186} INFO - Started process (PID=202) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:06.421+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:25:06.426+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:06.426+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:06.471+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:06.535+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:06.535+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:25:06.591+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:06.590+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:25:06.647+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.243 seconds
+[2026-07-09T18:25:36.929+0000] {processor.py:186} INFO - Started process (PID=207) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:36.932+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:25:36.936+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:36.935+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:36.981+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:25:37.042+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:37.041+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:25:37.097+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:25:37.097+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:25:37.152+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.233 seconds
+[2026-07-09T18:26:07.568+0000] {processor.py:186} INFO - Started process (PID=212) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:26:07.572+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:26:07.592+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:26:07.590+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:26:07.695+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:26:07.830+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:26:07.829+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:26:07.951+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:26:07.950+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:26:08.022+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.535 seconds
+[2026-07-09T18:27:46.761+0000] {processor.py:186} INFO - Started process (PID=189) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:27:46.763+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:27:46.775+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:27:46.774+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:27:46.860+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:27:46.939+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:27:46.939+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:27:47.040+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:27:47.040+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:27:47.072+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.331 seconds
+[2026-07-09T18:28:17.178+0000] {processor.py:186} INFO - Started process (PID=194) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:17.179+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:28:17.184+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:17.184+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:17.231+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:17.383+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:17.382+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:28:17.481+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:17.481+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:28:17.534+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.366 seconds
+[2026-07-09T18:28:47.710+0000] {processor.py:186} INFO - Started process (PID=199) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:47.712+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:28:47.720+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:47.719+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:47.762+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:28:47.879+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:47.879+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:28:47.994+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:28:47.993+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:28:48.069+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.371 seconds
+[2026-07-09T18:29:18.241+0000] {processor.py:186} INFO - Started process (PID=204) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:18.242+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:29:18.249+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:18.248+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:18.294+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:18.362+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:18.362+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:29:18.417+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:18.416+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:29:18.485+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.258 seconds
+[2026-07-09T18:29:48.725+0000] {processor.py:186} INFO - Started process (PID=209) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:48.726+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:29:48.731+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:48.730+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:48.780+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:29:48.850+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:48.850+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:29:48.907+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:29:48.906+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:29:48.950+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.235 seconds
+[2026-07-09T18:30:19.221+0000] {processor.py:186} INFO - Started process (PID=214) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:19.223+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:30:19.236+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:19.235+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:19.302+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:19.402+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:19.401+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:30:19.492+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:19.491+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:30:19.546+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.366 seconds
+[2026-07-09T18:30:49.892+0000] {processor.py:186} INFO - Started process (PID=219) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:49.894+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:30:49.898+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:49.897+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:49.952+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:30:50.012+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:50.011+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:30:50.081+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:30:50.081+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:30:50.130+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.249 seconds
+[2026-07-09T18:31:20.502+0000] {processor.py:186} INFO - Started process (PID=224) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:20.504+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:31:20.508+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:20.507+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:20.553+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:20.619+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:20.618+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:31:20.677+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:20.676+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:31:20.737+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.246 seconds
+[2026-07-09T18:31:50.835+0000] {processor.py:186} INFO - Started process (PID=229) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:50.837+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:31:50.843+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:50.843+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:50.891+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:31:50.957+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:50.956+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:31:51.019+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:31:51.018+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:31:51.085+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.263 seconds
+[2026-07-09T18:32:21.429+0000] {processor.py:186} INFO - Started process (PID=234) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:21.430+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:32:21.435+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:21.434+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:21.480+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:21.545+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:21.544+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:32:21.604+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:21.604+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:32:21.727+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.312 seconds
+[2026-07-09T18:32:51.874+0000] {processor.py:186} INFO - Started process (PID=239) to work on /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:51.879+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/inep_etl_dag.py for tasks to queue
+[2026-07-09T18:32:51.884+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:51.883+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:51.935+0000] {processor.py:925} INFO - DAG(s) 'inep_etl_dag' retrieved from /opt/airflow/dags/inep_etl_dag.py
+[2026-07-09T18:32:52.004+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:52.003+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2026-07-09T18:32:52.063+0000] {logging_mixin.py:190} INFO - [2026-07-09T18:32:52.062+0000] {dag.py:4180} INFO - Setting next_dagrun for inep_etl_dag to 2026-07-08 00:00:00+00:00, run_after=2026-07-09 00:00:00+00:00
+[2026-07-09T18:32:52.124+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/inep_etl_dag.py took 0.262 seconds
