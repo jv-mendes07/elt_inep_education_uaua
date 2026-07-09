@@ -1,0 +1,14 @@
+inep_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: postgres
+      password: postgres
+      port: 5432
+      dbname: inep
+      schema: public
+      threads: 1
+      keepalives_idle: 0
+      sslmode: disable

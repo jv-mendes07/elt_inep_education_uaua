@@ -1,0 +1,151 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    depends_on:
+      - postgres
+    ports:
+      - "8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    command: >
+      /bin/sh -c "superset db upgrade && superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@example.com --password admin && superset init && /usr/bin/run-server.sh"
+    restart: unless-stopped
+
+  jupyter:
+    image: jupyter/base-notebook:python-3.11
+    container_name: jupyter_lab
+    working_dir: /home/jovyan/work
+    volumes:
+      - .:/home/jovyan/work
+    ports:
+      - "8888:8888"
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+    command: >
+      start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  python:
+    image: python:3.11-slim
+    container_name: python_env
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: >
+      sh -c "pip install --no-cache-dir pandas sqlalchemy psycopg2-binary apache-airflow dbt-postgres && tail -f /dev/null"
+    restart: unless-stopped
+
+  dbt:
+    image: python:3.11-slim
+    container_name: dbt_env
+    working_dir: /workspace/dbt/inep_dbt
+    volumes:
+      - .:/workspace
+    environment:
+      DBT_PROFILES_DIR: /workspace/dbt
+    command: >
+      sh -c "pip install --no-cache-dir dbt-postgres psycopg2-binary && tail -f /dev/null"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  airflow-init:
+    image: apache/airflow:2.10.2
+    container_name: airflow_init
+    depends_on:
+      postgres:
+        condition: service_started
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+    volumes:
+      - .:/opt/airflow
+    entrypoint: /bin/bash
+    command: >
+      -c "pip install --no-cache-dir dbt-postgres psycopg2-binary && airflow db init && airflow users create --username admin --firstname Airflow --lastname Admin --role Admin --email admin@example.com --password admin"
+    restart: "no"
+
+  airflow-webserver:
+    image: apache/airflow:2.10.2
+    container_name: airflow_webserver
+    depends_on:
+      postgres:
+        condition: service_started
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+    volumes:
+      - .:/opt/airflow
+    ports:
+      - "8080:8080"
+    entrypoint: /bin/bash
+    command: >
+      -c "pip install --no-cache-dir dbt-postgres psycopg2-binary && airflow webserver"
+    restart: unless-stopped
+
+  airflow-scheduler:
+    image: apache/airflow:2.10.2
+    container_name: airflow_scheduler
+    depends_on:
+      postgres:
+        condition: service_started
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+    volumes:
+      - .:/opt/airflow
+    entrypoint: /bin/bash
+    command: >
+      -c "pip install --no-cache-dir dbt-postgres psycopg2-binary && airflow scheduler"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
