@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: dim_escola
+    description: Uma linha por escola x ano do censo, dentro da Região Geog. Intermediária de Juazeiro.
+    columns:
+      - name: co_entidade
+        tests: [not_null]
+      - name: ano_censo
+        tests: [not_null]
+      - name: tp_dependencia
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: tp_localizacao
+        tests:
+          - accepted_values:
+              values: [1, 2]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [co_entidade, ano_censo]
+
+  - name: dim_municipio
+    description: Uauá + municípios candidatos a par (Região Geog. Intermediária de Juazeiro), com flags is_target/is_peer.
+    columns:
+      - name: co_municipio
+        tests: [not_null, unique]
+      - name: is_target
+        tests: [not_null]
+      - name: is_peer
+        tests: [not_null]
+
+  - name: dim_etapa_ensino
+    columns:
+      - name: etapa_codigo
+        tests: [not_null, unique]
+
+  - name: fct_rendimento
+    description: >
+      Taxas de aprovação/reprovação/abandono — BRASIL/REGIAO/UF (benchmark)
+      e MUNICIPIO (todos os ~5570 municípios do Brasil, não só Uauá/pares —
+      o filtro para o escopo do projeto acontece em rpt_rendimento.sql).
+    columns:
+      - name: nivel_agregacao
+        tests:
+          - accepted_values:
+              values: [BRASIL, REGIAO, UF, MUNICIPIO, ESCOLA]
+      - name: etapa_codigo
+        tests:
+          - relationships:
+              to: ref('dim_etapa_ensino')
+              field: etapa_codigo
+
+  - name: fct_distorcao
+    description: >
+      Taxa de distorção idade-série — MUNICIPIO apenas (todos os
+      municípios; filtro para Uauá/pares em rpt_distorcao.sql). Sem
+      benchmark BRASIL/UF confirmado ainda.
+    columns:
+      - name: nivel_agregacao
+        tests:
+          - accepted_values:
+              values: [BRASIL, REGIAO, UF, MUNICIPIO, ESCOLA]
+      - name: etapa_codigo
+        tests:
+          - relationships:
+              to: ref('dim_etapa_ensino')
+              field: etapa_codigo
+
+  - name: fct_ideb
+    description: >
+      Notas IDEB — BRASIL/UF (benchmark, modalidade ensino médio integrado)
+      e MUNICIPIO x 3 modalidades padrão (todos os municípios; filtro para
+      Uauá/pares em rpt_ideb.sql).
+    columns:
+      - name: nivel_agregacao
+        tests:
+          - accepted_values:
+              values: [BRASIL, REGIAO, UF, MUNICIPIO, ESCOLA]
+      - name: ano
+        tests:
+          - accepted_values:
+              values: [2019, 2021, 2023, 2025]
+
+  - name: fct_matriculas
+    description: Grão escola x etapa x ano.
+    columns:
+      - name: co_entidade
+        tests:
+          - relationships:
+              to: ref('dim_escola')
+              field: co_entidade
+      - name: co_municipio
+        tests:
+          - relationships:
+              to: ref('dim_municipio')
+              field: co_municipio
+      - name: etapa_codigo
+        tests:
+          - relationships:
+              to: ref('dim_etapa_ensino')
+              field: etapa_codigo
+      - name: qt_matriculas
+        tests: [not_null]
