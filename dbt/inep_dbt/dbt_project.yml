@@ -11,6 +11,23 @@ snapshot-paths: ["snapshots"]
 clean-targets:
   - "target"
   - "dbt_packages"
+vars:
+  # Número de municípios pares (mais similares a Uauá em população e mix
+  # urbano/rural) sinalizados como is_peer em marts.dim_municipio.
+  qt_municipios_pares: 8
+  # Código IBGE do município-alvo do projeto (Uauá - BA).
+  co_municipio_alvo: 2932002
+  # Código da Região Geográfica Intermediária usada para restringir o
+  # universo de municípios candidatos a pares (Região de Juazeiro - BA).
+  co_regiao_geog_interm_alvo: 2908
+
 models:
   inep_dbt:
-    +materialized: table
+    staging:
+      +schema: staging
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+      reporting:
+        +materialized: view

@@ -1,0 +1,11 @@
+etapa_codigo,etapa_nome,nivel_agregado,ordem
+inf_cre,Creche,Educação Infantil,1
+inf_pre,Pré-escola,Educação Infantil,2
+fund_ai,Ensino Fundamental - Anos Iniciais,Ensino Fundamental,3
+fund_af,Ensino Fundamental - Anos Finais,Ensino Fundamental,4
+med,Ensino Médio,Ensino Médio,5
+prof_tec,Educação Profissional Técnica,Educação Profissional,6
+eja_fund,EJA - Ensino Fundamental,Educação de Jovens e Adultos,7
+eja_med,EJA - Ensino Médio,Educação de Jovens e Adultos,8
+esp_cc,Educação Especial - Classe Comum,Educação Especial,9
+esp_ce,Educação Especial - Classe Exclusiva,Educação Especial,10

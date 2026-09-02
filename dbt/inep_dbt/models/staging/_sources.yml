@@ -1,0 +1,70 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Camada raw, carregada pelo Airflow (dags/inep_etl_dag.py) via
+      load_dataframe_partitioned/load_dataframe_full_refresh — uma tabela
+      por (arquivo-fonte x grão), no grão da fonte, com carga idempotente
+      (delete + COPY, ou full refresh — ver dags/inep_pipeline/load.py). Os
+      nomes de coluna preservam exatamente a grafia (maiúscula/minúscula) do
+      arquivo original, por isso os modelos de staging precisam
+      referenciá-las entre aspas duplas, ex. "NU_ANO_CENSO".
+    schema: raw
+    tables:
+      - name: escolas
+        description: >
+          Censo Escolar da Educação Básica — INEP. Uma linha por escola por
+          ano (NU_ANO_CENSO + CO_ENTIDADE). Carga completa nacional; o filtro
+          para o escopo do projeto (Região Geog. Intermediária de Juazeiro)
+          acontece em stg_escolas.
+      - name: taxas_rendimento_uf
+        description: >
+          Taxas de rendimento escolar (aprovação/reprovação/abandono),
+          grão Brasil/Região/UF — INEP. Confirmado contra
+          tx_rend_brasil_regioes_ufs_2024.xlsx. Sem CO_MUNICIPIO — serve
+          como linhas de benchmark (ver stg_taxas_rendimento_uf.sql).
+      - name: taxas_rendimento_municipios
+        description: >
+          Mesmo indicador, grão Município (com CO_MUNICIPIO/NO_MUNICIPIO) —
+          INEP. Confirmado contra tx_rend_municipios_2024.xlsx. É esta fonte
+          que traz Uauá (ver stg_taxas_rendimento_municipios.sql).
+      - name: distorcao_idade_serie_municipios
+        description: >
+          Taxa de distorção idade-série, grão Município — INEP. Confirmado
+          contra TDI_MUNICIPIOS_2024.xlsx (ver stg_distorcao_idade_serie.sql).
+          Ainda não há uma fonte Brasil/UF confirmada (ver docs/data_sources.md).
+      - name: ideb_brasil_ensino_medio_integrado
+        description: >
+          Resultados do IDEB, grão Brasil, modalidade ensino médio
+          integrado (edições 2019-2025 em colunas largas, só
+          2019/2021/2023/2025 são desempilhadas — ver unpivot_ideb.sql).
+          Confirmado contra divulgacao_brasil_Ensino_Medio_integrado_ideb_2025.xlsx.
+      - name: ideb_ufs_ensino_medio_integrado
+        description: >
+          Mesmo indicador/modalidade, grão UF. Confirmado contra
+          divulgacao_ufs_Ensino_Medio_integrado_ideb_2025.xlsx. Tabela
+          própria, não compartilhada com ideb_brasil_ensino_medio_integrado
+          — rodar o DAG revelou que este arquivo tem uma edição 2017 extra
+          que o arquivo Brasil não tem, então os dois têm número de colunas
+          diferente (ver config.ideb_raw_table).
+      - name: ideb_municipios_anos_iniciais_fundamental
+        description: >
+          IDEB grão Município, modalidade Anos Iniciais do Fundamental —
+          INEP. Confirmado contra divulgacao_anos_iniciais_municipios_2025.xlsx
+          (Uauá presente: CO_MUNICIPIO=2932002). Tabela própria por ter
+          colunas de série diferentes das outras modalidades (1º-5º ano).
+      - name: ideb_municipios_anos_finais_fundamental
+        description: >
+          IDEB grão Município, modalidade Anos Finais do Fundamental —
+          INEP. Mesmo padrão de ideb_municipios_anos_iniciais_fundamental,
+          colunas de série 6º-9º ano.
+      - name: ideb_municipios_ensino_medio
+        description: >
+          IDEB grão Município, modalidade Ensino Médio regular (não
+          "integrado") — INEP. Mesmo padrão, colunas de série 1ª-3ª/4ª série.
+      - name: populacao_municipios
+        description: >
+          Estimativas de população residente por município — IBGE (API
+          SIDRA, tabela 6579). Usada como insumo para a seleção de
+          municípios pares em marts.dim_municipio.
