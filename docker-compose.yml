@@ -94,6 +94,7 @@ services:
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
       DBT_PROFILES_DIR: /opt/airflow/dbt
       DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+      AIRFLOW_CONN_POSTGRES_INEP: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     volumes:
       - .:/opt/airflow
     entrypoint: /bin/bash
@@ -119,6 +120,7 @@ services:
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
       DBT_PROFILES_DIR: /opt/airflow/dbt
       DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+      AIRFLOW_CONN_POSTGRES_INEP: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     volumes:
       - .:/opt/airflow
     ports:
@@ -146,6 +148,7 @@ services:
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
       DBT_PROFILES_DIR: /opt/airflow/dbt
       DBT_PROJECT_DIR: /opt/airflow/dbt/inep_dbt
+      AIRFLOW_CONN_POSTGRES_INEP: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
     volumes:
       - .:/opt/airflow
     entrypoint: /bin/bash
