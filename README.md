@@ -42,16 +42,19 @@ Airflow: `localhost:8080` · Superset: `localhost:8088` · pgAdmin: `localhost:5
 
 ## Status
 
-- ✅ Censo Escolar 2024 — extração, carga idempotente em `raw.escolas` e
-  normalização completa via dbt (`stg_escolas` → `dim_escola`/
-  `fct_matriculas`/`dim_municipio` com seleção de municípios pares).
-- ⚠️ Taxas de rendimento, distorção idade-série e IDEB — DAG e schema
-  prontos, mas **as URLs oficiais de download e o mapeamento exato de
-  colunas ainda precisam ser confirmados manualmente** (as páginas do INEP
-  são renderizadas via JavaScript). Ver [`docs/data_sources.md`](docs/data_sources.md)
-  para o checklist e o status de cada fonte.
-- ⏳ Dashboard Superset — a construir sobre os modelos `marts.reporting.rpt_*`
-  assim que as fontes acima estiverem carregadas.
+- ✅ Pipeline validado ponta a ponta (Airflow + Postgres): Censo, taxas de
+  rendimento (Brasil/UF + município), distorção idade-série e IDEB
+  2019–2025 extraem, carregam em `raw.*` e normalizam via dbt até
+  `marts.reporting.rpt_*`. Todos os testes dbt passam.
+- ✅ **Backfill multi-ano** — o DAG faz dynamic task mapping sobre a
+  Variable `inep_anos_ingestao` (default `[2024]`). Para carregar 2019–2025:
+  ```bash
+  docker compose exec airflow-webserver airflow variables set inep_anos_ingestao '[2019,2020,2021,2022,2023,2024,2025]'
+  docker compose exec airflow-webserver airflow dags trigger inep_etl_dag
+  ```
+  URLs montadas por template `{ano}` em `config.py`, com override por ano
+  via Variable. Ver [`docs/data_sources.md`](docs/data_sources.md).
+- ⏳ Dashboard Superset — a construir sobre os modelos `marts.reporting.rpt_*`.
 
 O plano completo de implementação (contexto, decisões e critérios de
 conclusão do v1) está em

@@ -1,0 +1,20 @@
+version: 2
+
+seeds:
+  - name: seed_municipios_regiao_alvo
+    description: >
+      Os 18 municípios da Região Geográfica Intermediária de Juazeiro
+      (co_regiao_geog_interm = 2908), gerados a partir do Censo Escolar
+      2024. Usado por stg_escolas como filtro de região E como fonte de
+      co/no_regiao_geog_interm para os anos de Censo que não trazem essa
+      coluna (2019-2022). Regenerar a partir de um Censo mais recente se a
+      composição da região mudar.
+    config:
+      column_types:
+        co_municipio: integer
+        co_regiao_geog_interm: integer
+    columns:
+      - name: co_municipio
+        tests: [not_null, unique]
+      - name: co_regiao_geog_interm
+        tests: [not_null]

@@ -28,6 +28,36 @@ def _table_exists(conn, schema: str, table: str) -> bool:
     return result is not None
 
 
+def _table_columns(conn, schema: str, table: str) -> list[str]:
+    rows = conn.execute(
+        text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_schema = :s AND table_name = :t ORDER BY ordinal_position"
+        ),
+        {"s": schema, "t": table},
+    ).fetchall()
+    return [r[0] for r in rows]
+
+
+def _align_to_table(df: pd.DataFrame, existing_cols: list[str], schema: str, table: str) -> pd.DataFrame:
+    """Reindex `df` to the raw table's existing column set/order before COPY.
+
+    Raw tables are appended to across years/partitions; a source column that
+    drifted in or out of a later year's file (INEP does this — an extra IDEB
+    edition, a new etapa column) would otherwise misalign the positional
+    COPY and raise BadCopyFileFormat. Extra source columns are dropped
+    (logged); columns absent from this partition are filled NULL.
+    """
+    df_cols = set(df.columns)
+    dropped = [c for c in df.columns if c not in existing_cols]
+    added = [c for c in existing_cols if c not in df_cols]
+    if dropped:
+        logger.warning("%s.%s: source columns not in table, dropped: %s", schema, table, dropped)
+    if added:
+        logger.warning("%s.%s: table columns absent from this load, filled NULL: %s", schema, table, added)
+    return df.reindex(columns=existing_cols)
+
+
 def _create_table_from_df(conn, df: pd.DataFrame, schema: str, table: str) -> None:
     """Create `{schema}.{table}` with every column typed TEXT, matching
     `df`'s columns exactly (case preserved).
@@ -96,6 +126,7 @@ def load_dataframe_full_refresh(
     with engine.begin() as conn:
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
         if _table_exists(conn, schema, table):
+            df = _align_to_table(df, _table_columns(conn, schema, table), schema, table)
             conn.execute(text(f"TRUNCATE TABLE {schema}.{table}"))
         else:
             _create_table_from_df(conn, df, schema, table)
@@ -128,6 +159,7 @@ def load_dataframe_partitioned(
         conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
 
         if _table_exists(conn, schema, table):
+            df = _align_to_table(df, _table_columns(conn, schema, table), schema, table)
             # Every raw.* column is TEXT (see _create_table_from_df), so
             # bind params are stringified here — an int/str bind parameter
             # compared against a TEXT column raises "operator does not

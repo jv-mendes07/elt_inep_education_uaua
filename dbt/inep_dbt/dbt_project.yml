@@ -19,7 +19,14 @@ vars:
   co_municipio_alvo: 2932002
   # Código da Região Geográfica Intermediária usada para restringir o
   # universo de municípios candidatos a pares (Região de Juazeiro - BA).
+  # Materializado no seed seed_municipios_regiao_alvo (o Censo não traz
+  # essa coluna antes de 2023 — ver stg_escolas.sql).
   co_regiao_geog_interm_alvo: 2908
+  # Ano-snapshot para a seleção de pares e para o regression check das 38
+  # escolas. Num backfill multi-ano, dim_municipio precisa de UM ano de
+  # referência (população + mix rural mudam de ano a ano); os fatos e
+  # relatórios continuam multi-ano.
+  ano_referencia_pares: 2024
 
 models:
   inep_dbt:

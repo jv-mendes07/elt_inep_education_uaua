@@ -1,18 +1,32 @@
-"""INEP Uauá-BA education data pipeline — v1 (2024 census/rendimento/
-distortion + IDEB 2019-2025).
+"""INEP Uauá-BA education data pipeline.
 
-extract_* (parallel) -> matching load_raw_* (parallel) -> dbt deps/seed/run/test
--> data_quality_checks.
+Ingests, for every year in the `inep_anos_ingestao` Airflow Variable
+(default `[2024]`), INEP's school census, taxas de rendimento (Brasil/UF +
+município), taxa de distorção idade-série, plus IDEB 2019-2025 (edition-wide
+files, independent of the year list) and IBGE população. A multi-year
+backfill is `airflow variables set inep_anos_ingestao '[2019,...,2025]'`
+followed by a re-trigger — the per-year extract/load tasks are dynamically
+mapped, so adding years adds task instances, not code.
 
-Manually triggered (schedule=None) — see docs/data_sources.md for the
-Airflow Variables this DAG depends on, and
+The year list is read inside a task (`anos_ingestao`), NOT at DAG-parse
+time: `.expand()` over a plain module-level list bakes in whatever the
+Variable held at the scheduler's LAST parse of this file, which is stale
+the moment you change the Variable and trigger without waiting for (or
+forcing) a re-parse — silently running fewer years than requested, with no
+error. Mapping over `anos_ingestao()`'s XCom output instead re-resolves the
+Variable fresh on every run.
+
+extract_* (mapped per year) -> matching load_raw_* (mapped) -> dbt
+deps/seed/run/test -> data_quality_checks.
+
+Manually triggered (schedule=None) — see docs/data_sources.md for the URL
+templates and per-year overrides, and
 C:\\Users\\João Victor\\.claude\\plans\\i-have-this-data-radiant-newell.md
 for the full pipeline design.
 
-Extract tasks download/read their source and cache it to a scratch CSV under
-DATA_DIR/_xcom/, passing only the *path* through XCom rather than the whole
-dataframe — the census alone is ~215k rows x 426 columns, far too large to
-serialize into Airflow's XCom backend directly.
+Extract tasks cache their source to a scratch CSV under DATA_DIR/_xcom/ and
+pass only the *path* (plus the year) through XCom — the census alone is
+~215k rows, far too large to serialize into Airflow's XCom backend.
 """
 from __future__ import annotations
 
@@ -54,49 +68,96 @@ def _cache_to_scratch(df, name: str) -> str:
     start_date=dt.datetime(2024, 1, 1),
     catchup=False,
     default_args=default_args,
+    # A full backfill fans out to ~24 mapped extract tasks. Reading a 300 MB
+    # census CSV or a 65k-row spreadsheet costs ~0.5-1 GB each; cap
+    # concurrency so the whole set doesn't OOM the container (7.4 GB shared
+    # with Postgres + the scheduler).
+    max_active_tasks=3,
     tags=["inep", "uaua", "education"],
 )
 def inep_etl_dag():
 
-    # ---- extract -----------------------------------------------------
+    # ---- year lists (resolved fresh every run, see module docstring) ----
 
     @task
-    def extract_taxas_rendimento_uf() -> str:
-        return _cache_to_scratch(extract.extract_taxas_rendimento_uf(), "taxas_rendimento_uf")
+    def anos_ingestao() -> list[int]:
+        return config.get_anos_ingestao()
 
     @task
-    def extract_taxas_rendimento_municipios() -> str:
-        return _cache_to_scratch(
-            extract.extract_taxas_rendimento_municipios(), "taxas_rendimento_municipios"
-        )
+    def anos_censo(anos: list[int]) -> list[int]:
+        # Census only exists up to CENSO_ANO_MAXIMO (later years not
+        # published yet) — don't map a task instance onto a year with no file.
+        return [a for a in anos if a <= config.CENSO_ANO_MAXIMO]
 
     @task
-    def extract_distorcao_idade_serie() -> str:
-        return _cache_to_scratch(extract.extract_distorcao_idade_serie(), "distorcao_idade_serie")
+    def anos_rendimento_municipios(anos: list[int]) -> list[int]:
+        # Early years use an older spreadsheet template with no
+        # machine-readable header row (see config.TAXAS_RENDIMENTO_*_ANO_MINIMO)
+        # — excluded so the raw table is never created from that schema.
+        return [a for a in anos if a >= config.TAXAS_RENDIMENTO_MUNICIPIOS_ANO_MINIMO]
 
+    @task
+    def anos_rendimento_uf(anos: list[int]) -> list[int]:
+        return [a for a in anos if a >= config.TAXAS_RENDIMENTO_UF_ANO_MINIMO]
+
+    # ---- extract (mapped per year) ----------------------------------
+
+    @task
+    def extract_censo(ano: int) -> dict:
+        return {"ano": ano, "csv_path": _cache_to_scratch(extract.read_censo_escolar(ano), f"escolas_{ano}")}
+
+    @task
+    def extract_taxas_rendimento_uf(ano: int) -> dict:
+        return {
+            "ano": ano,
+            "csv_path": _cache_to_scratch(
+                extract.extract_taxas_rendimento_uf(ano), f"taxas_rendimento_uf_{ano}"
+            ),
+        }
+
+    @task
+    def extract_taxas_rendimento_municipios(ano: int) -> dict:
+        return {
+            "ano": ano,
+            "csv_path": _cache_to_scratch(
+                extract.extract_taxas_rendimento_municipios(ano),
+                f"taxas_rendimento_municipios_{ano}",
+            ),
+        }
+
+    @task
+    def extract_distorcao_idade_serie(ano: int) -> dict:
+        return {
+            "ano": ano,
+            "csv_path": _cache_to_scratch(
+                extract.extract_distorcao_idade_serie(ano), f"distorcao_idade_serie_{ano}"
+            ),
+        }
+
+    # IDEB files are edition-wide (2019/2021/2023/2025 in one file), split by
+    # nível × modalidade, not by year — mapped over config.IDEB_FONTES, not
+    # ANOS_INGESTAO.
     @task
     def extract_ideb(nivel: str, modalidade: str) -> str:
         return _cache_to_scratch(extract.extract_ideb(nivel, modalidade), f"ideb_{nivel}_{modalidade}")
 
     @task
-    def extract_populacao_ibge() -> str:
-        return _cache_to_scratch(extract.extract_populacao_ibge(), "populacao_municipios")
+    def extract_populacao_ibge(anos: list[int]) -> str:
+        return _cache_to_scratch(extract.extract_populacao_ibge(anos), "populacao_municipios")
 
-    # ---- load --------------------------------------------------------
+    # ---- load (mapped per year) ------------------------------------
 
     @task
-    def load_raw_escolas():
-        # No extract task: the census CSV is already local (see
-        # notebooks/data/microdados_censo_escolar_2024_defeso/), so this
-        # task reads it directly rather than round-tripping through XCom.
-        df = extract.read_censo_escolar()
+    def load_raw_escolas(ano: int, csv_path: str):
+        import pandas as pd
+
+        df = pd.read_csv(csv_path, dtype=str)
         load_dataframe_to_raw(
-            df, "raw", "escolas", "NU_ANO_CENSO", config.NU_ANO_CENSO,
-            config.get_postgres_uri(),
+            df, "raw", "escolas", "NU_ANO_CENSO", ano, config.get_postgres_uri()
         )
 
     @task
-    def load_raw_taxas_rendimento_uf(csv_path: str):
+    def load_raw_taxas_rendimento_uf(ano: int, csv_path: str):
         import pandas as pd
 
         df = pd.read_csv(csv_path)
@@ -105,31 +166,30 @@ def inep_etl_dag():
         # so idempotent per-year delete+reload works regardless of how
         # INEP's real file is laid out — overwrites a same-named column if
         # the source happens to already have one.
-        df["NU_ANO_CENSO"] = config.NU_ANO_CENSO
+        df["NU_ANO_CENSO"] = ano
         load_dataframe_to_raw(
-            df, "raw", "taxas_rendimento_uf", "NU_ANO_CENSO", config.NU_ANO_CENSO,
+            df, "raw", "taxas_rendimento_uf", "NU_ANO_CENSO", ano, config.get_postgres_uri()
+        )
+
+    @task
+    def load_raw_taxas_rendimento_municipios(ano: int, csv_path: str):
+        import pandas as pd
+
+        df = pd.read_csv(csv_path)
+        df["NU_ANO_CENSO"] = ano
+        load_dataframe_to_raw(
+            df, "raw", "taxas_rendimento_municipios", "NU_ANO_CENSO", ano,
             config.get_postgres_uri(),
         )
 
     @task
-    def load_raw_taxas_rendimento_municipios(csv_path: str):
+    def load_raw_distorcao(ano: int, csv_path: str):
         import pandas as pd
 
         df = pd.read_csv(csv_path)
-        df["NU_ANO_CENSO"] = config.NU_ANO_CENSO
+        df["NU_ANO_CENSO"] = ano
         load_dataframe_to_raw(
-            df, "raw", "taxas_rendimento_municipios", "NU_ANO_CENSO", config.NU_ANO_CENSO,
-            config.get_postgres_uri(),
-        )
-
-    @task
-    def load_raw_distorcao(csv_path: str):
-        import pandas as pd
-
-        df = pd.read_csv(csv_path)
-        df["NU_ANO_CENSO"] = config.NU_ANO_CENSO
-        load_dataframe_to_raw(
-            df, "raw", "distorcao_idade_serie_municipios", "NU_ANO_CENSO", config.NU_ANO_CENSO,
+            df, "raw", "distorcao_idade_serie_municipios", "NU_ANO_CENSO", ano,
             config.get_postgres_uri(),
         )
 
@@ -152,10 +212,8 @@ def inep_etl_dag():
         import pandas as pd
 
         df = pd.read_csv(csv_path)
-        # Full refresh, not year-partitioned delete: SIDRA's period-column
-        # semantics (D2C vs D3C) are still pending confirmation — see
-        # stg_populacao_municipios.sql — and the table is small enough that
-        # a full replace is simplest and always correct.
+        # Full refresh, not year-partitioned: the whole SIDRA series is
+        # re-pulled in one call each run, and the table is small.
         load_dataframe_full_refresh(
             df, "raw", "populacao_municipios", config.get_postgres_uri(),
         )
@@ -185,37 +243,55 @@ def inep_etl_dag():
     # ---- data quality --------------------------------------------------
 
     @task
-    def data_quality_checks():
-        """Extra sanity check beyond dbt tests: raw.escolas row count for
-        Uauá/2024 must match the 38 schools already verified in
-        notebooks/inep_qedu_data_dev.ipynb."""
+    def data_quality_checks(anos_censo: list[int]):
+        """Beyond the dbt tests: every ingested census year must have some
+        schools for Uauá, and the reference year (config.NU_ANO_CENSO) must
+        match the 38 schools verified in notebooks/inep_qedu_data_dev.ipynb."""
         engine = create_engine(config.get_postgres_uri())
+        problems = []
         with engine.connect() as conn:
             # raw.escolas columns are TEXT (see inep_pipeline/load.py), so
             # bind params are compared as strings, not ints.
-            count = conn.execute(
+            rows = conn.execute(
                 text(
-                    'SELECT COUNT(*) FROM raw.escolas '
-                    'WHERE "NU_ANO_CENSO" = :ano AND "CO_MUNICIPIO" = :municipio'
+                    'SELECT "NU_ANO_CENSO" AS ano, COUNT(*) AS n FROM raw.escolas '
+                    'WHERE "CO_MUNICIPIO" = :municipio GROUP BY "NU_ANO_CENSO"'
                 ),
-                {"ano": str(config.NU_ANO_CENSO), "municipio": str(config.CO_MUNICIPIO_ALVO)},
-            ).scalar()
-        if count != 38:
-            raise AirflowException(
-                f"Expected 38 schools for Uauá/{config.NU_ANO_CENSO} in "
-                f"raw.escolas, found {count}."
+                {"municipio": str(config.CO_MUNICIPIO_ALVO)},
+            ).fetchall()
+        por_ano = {int(r.ano): r.n for r in rows}
+        logger.info("Uauá schools per census year: %s", por_ano)
+
+        for ano in anos_censo:
+            if por_ano.get(ano, 0) == 0:
+                problems.append(f"no schools for Uauá in census {ano}")
+        if config.NU_ANO_CENSO in anos_censo and por_ano.get(config.NU_ANO_CENSO) != 38:
+            problems.append(
+                f"expected 38 schools for Uauá/{config.NU_ANO_CENSO}, "
+                f"found {por_ano.get(config.NU_ANO_CENSO)}"
             )
-        logger.info("Data quality check passed: %s schools for Uauá/%s.", count, config.NU_ANO_CENSO)
+        if problems:
+            raise AirflowException("Data quality checks failed: " + "; ".join(problems))
+        logger.info("Data quality checks passed for years %s.", anos_censo)
 
     # ---- wiring ----------------------------------------------------------
 
-    load_escolas = load_raw_escolas()
-    load_rendimento_uf = load_raw_taxas_rendimento_uf(extract_taxas_rendimento_uf())
-    load_rendimento_municipios = load_raw_taxas_rendimento_municipios(
-        extract_taxas_rendimento_municipios()
+    anos = anos_ingestao()
+    anos_censo_ = anos_censo(anos)
+    anos_rendimento_uf_ = anos_rendimento_uf(anos)
+    anos_rendimento_municipios_ = anos_rendimento_municipios(anos)
+
+    load_escolas = load_raw_escolas.expand_kwargs(extract_censo.expand(ano=anos_censo_))
+    load_rendimento_uf = load_raw_taxas_rendimento_uf.expand_kwargs(
+        extract_taxas_rendimento_uf.expand(ano=anos_rendimento_uf_)
     )
-    load_distorcao = load_raw_distorcao(extract_distorcao_idade_serie())
-    load_populacao = load_raw_populacao(extract_populacao_ibge())
+    load_rendimento_municipios = load_raw_taxas_rendimento_municipios.expand_kwargs(
+        extract_taxas_rendimento_municipios.expand(ano=anos_rendimento_municipios_)
+    )
+    load_distorcao = load_raw_distorcao.expand_kwargs(
+        extract_distorcao_idade_serie.expand(ano=anos)
+    )
+    load_populacao = load_raw_populacao(extract_populacao_ibge(anos))
 
     load_ideb_tasks = []
     for nivel, modalidade in config.IDEB_FONTES:
@@ -225,7 +301,7 @@ def inep_etl_dag():
             load_raw_ideb.override(task_id=f"load_raw_ideb_{suffix}")(ideb_csv, nivel, modalidade)
         )
 
-    quality = data_quality_checks()
+    quality = data_quality_checks(anos_censo_)
 
     [
         load_escolas, load_rendimento_uf, load_rendimento_municipios,
