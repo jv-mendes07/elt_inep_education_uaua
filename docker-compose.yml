@@ -88,7 +88,13 @@ services:
         condition: service_started
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Airflow's OWN metadata (DAG runs, task history, Variables, users)
+      # lives in a dedicated "airflow" database — NOT ${POSTGRES_DB} (inep),
+      # which is the warehouse (raw/staging/marts). They used to share one
+      # database, which is why airflow-init used to DROP+CREATE it on every
+      # startup: that was wiping the warehouse along with Airflow's own
+      # state. See the idempotent bootstrap below instead.
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
@@ -98,8 +104,20 @@ services:
     volumes:
       - .:/opt/airflow
     entrypoint: /bin/bash
+    # Idempotent bootstrap: safe on a brand-new volume (creates the airflow
+    # database, migrates, creates the admin user) AND safe to re-run against
+    # an already-initialized one (creates nothing that already exists,
+    # `airflow db migrate` is itself a safe no-op/upgrade). Never touches
+    # ${POSTGRES_DB} (inep) — that database is created once by the postgres
+    # image itself (via its own POSTGRES_DB env var) and only ever written
+    # to by the DAG/dbt from here on.
     command: >
-      -c "pip install --no-cache-dir dbt-postgres psycopg2-binary && export PGPASSWORD='${POSTGRES_PASSWORD}' && psql -h postgres -U ${POSTGRES_USER} -d postgres -c \"DROP DATABASE IF EXISTS ${POSTGRES_DB};\" && psql -h postgres -U ${POSTGRES_USER} -d postgres -c \"CREATE DATABASE ${POSTGRES_DB};\" && airflow db migrate && airflow users create --username admin --firstname Airflow --lastname Admin --role Admin --email admin@example.com --password admin"
+      -c "pip install --no-cache-dir dbt-postgres psycopg2-binary &&
+      export PGPASSWORD='${POSTGRES_PASSWORD}' &&
+      (psql -h postgres -U ${POSTGRES_USER} -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'airflow'\" | grep -q 1 ||
+      psql -h postgres -U ${POSTGRES_USER} -d postgres -c \"CREATE DATABASE airflow;\") &&
+      airflow db migrate &&
+      (airflow users list | grep -q admin || airflow users create --username admin --firstname Airflow --lastname Admin --role Admin --email admin@example.com --password admin)"
     restart: "no"
 
   airflow-webserver:
@@ -114,7 +132,9 @@ services:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Airflow's own metadata DB — see the comment on airflow-init. NOT
+      # ${POSTGRES_DB} (inep), which is the warehouse.
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
@@ -142,7 +162,9 @@ services:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      # Airflow's own metadata DB — see the comment on airflow-init. NOT
+      # ${POSTGRES_DB} (inep), which is the warehouse.
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
