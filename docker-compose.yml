@@ -27,15 +27,44 @@ services:
   superset:
     image: apache/superset:latest
     container_name: superset
+    # The default non-root user can't write into /app/pythonpath (where
+    # psycopg2-binary needs to land, see the command below — its own
+    # site-packages dir isn't writable either). Running as root is a
+    # deliberate local-dev tradeoff; revisit if/when this moves toward the
+    # restricted-delivery phase (see project notes on that).
+    user: root
     depends_on:
       - postgres
     ports:
       - "8088:8088"
     environment:
       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
-      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Superset's OWN metadata (dashboards/charts/datasets/users) — its own
+      # database, not ${POSTGRES_DB} (inep, the warehouse). See
+      # superset_config.py and ensure_superset_db.py.
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/superset
+    volumes:
+      # /app/pythonpath is on the official image's PYTHONPATH, so Superset
+      # auto-imports superset_config.py as a module on startup.
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py
+      - ./superset/ensure_superset_db.py:/app/pythonpath/ensure_superset_db.py
+    # The base image ships with no Postgres driver at all (psycopg2 isn't
+    # importable), so neither Superset's own metadata store nor any
+    # Postgres connection made through the UI (e.g. to "inep") worked
+    # before this. Installed on every start, matching the same pattern
+    # already used by the airflow-* services. --target=/app/pythonpath
+    # because that's the one directory confirmed to be on the actual
+    # runtime venv's sys.path — the venv itself has no pip inside it, and
+    # its own site-packages isn't on PYTHONPATH the way /app/pythonpath is.
     command: >
-      /bin/sh -c "superset db upgrade && superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@example.com --password admin && superset init && /usr/bin/run-server.sh"
+      /bin/sh -c "pip install --no-cache-dir --target=/app/pythonpath psycopg2-binary &&
+      python3 /app/pythonpath/ensure_superset_db.py &&
+      superset db upgrade &&
+      superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@example.com --password admin &&
+      superset init &&
+      /usr/bin/run-server.sh"
     restart: unless-stopped
 
   jupyter:
